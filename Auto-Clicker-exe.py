@@ -12,59 +12,90 @@ class AutoClickerGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("自動點擊器")
-        self.root.geometry("600x800")
+        self.root.geometry("800x1000")
         
-        # 強制使用系統預設主題
-        if tk.TkVersion >= 8.5:
-            self.root.tk.call('tk', 'scaling', 1.0)
+        # 設定基本顏色
+        BG_COLOR = 'white'
+        FG_COLOR = 'black'
         
-        # 主框架設定
-        self.main_frame = ttk.Frame(root)
-        self.main_frame.pack(padx=10, pady=10, fill='both', expand=True)
+        # 主frame
+        self.main_frame = tk.Frame(root, bg=BG_COLOR)
+        self.main_frame.pack(fill='both', expand=True, padx=10, pady=10)
         
         # URL 輸入區
-        url_label = ttk.Label(self.main_frame, text="請輸入網址 (每行一個):")
-        url_label.pack(anchor='w')
+        url_label = tk.Label(self.main_frame, text="請輸入網址 (每行一個):", 
+                            bg=BG_COLOR, fg=FG_COLOR, font=('Arial', 12))
+        url_label.pack(anchor='w', pady=(0,5))
         
-        self.url_text = tk.Text(self.main_frame, width=60, height=10)
-        self.url_text.pack(pady=5, fill='both')
+        self.url_text = tk.Text(self.main_frame, width=70, height=10, 
+                               bg='white', fg='black', font=('Arial', 11))
+        self.url_text.pack(fill='x', pady=(0,10))
         
-        # 設定區
-        settings_frame = ttk.LabelFrame(self.main_frame, text="設定", padding="5")
-        settings_frame.pack(pady=10, fill='x')
+        # 設定區 Frame
+        settings_frame = tk.LabelFrame(self.main_frame, text="設定", 
+                                     bg=BG_COLOR, fg=FG_COLOR, font=('Arial', 12))
+        settings_frame.pack(fill='x', pady=10)
         
         # 點擊次數設定
-        clicks_frame = ttk.Frame(settings_frame)
-        clicks_frame.pack(fill='x', pady=2)
-        ttk.Label(clicks_frame, text="點擊次數:").pack(side='left')
+        clicks_frame = tk.Frame(settings_frame, bg=BG_COLOR)
+        clicks_frame.pack(fill='x', pady=5, padx=5)
+        
+        clicks_label = tk.Label(clicks_frame, text="點擊次數:", 
+                               bg=BG_COLOR, fg=FG_COLOR, font=('Arial', 11))
+        clicks_label.pack(side='left')
+        
         self.clicks_var = tk.StringVar(value="200")
-        ttk.Entry(clicks_frame, textvariable=self.clicks_var, width=10).pack(side='left', padx=5)
+        clicks_entry = tk.Entry(clicks_frame, textvariable=self.clicks_var, 
+                              width=10, font=('Arial', 11))
+        clicks_entry.pack(side='left', padx=5)
         
         # 影片播放時間設定
-        video_frame = ttk.Frame(settings_frame)
-        video_frame.pack(fill='x', pady=2)
-        ttk.Label(video_frame, text="影片播放時間 (秒):").pack(side='left')
+        video_frame = tk.Frame(settings_frame, bg=BG_COLOR)
+        video_frame.pack(fill='x', pady=5, padx=5)
+        
+        video_label = tk.Label(video_frame, text="影片播放時間 (秒):", 
+                              bg=BG_COLOR, fg=FG_COLOR, font=('Arial', 11))
+        video_label.pack(side='left')
+        
         self.video_time_var = tk.StringVar(value="3")
-        ttk.Entry(video_frame, textvariable=self.video_time_var, width=10).pack(side='left', padx=5)
+        video_entry = tk.Entry(video_frame, textvariable=self.video_time_var, 
+                             width=10, font=('Arial', 11))
+        video_entry.pack(side='left', padx=5)
         
         # 按鈕區
-        button_frame = ttk.Frame(self.main_frame)
+        button_frame = tk.Frame(self.main_frame, bg=BG_COLOR)
         button_frame.pack(pady=10)
         
-        self.start_button = ttk.Button(button_frame, text="開始執行", command=self.start_clicking)
+        self.start_button = tk.Button(button_frame, text="開始執行", 
+                                    command=self.start_clicking, 
+                                    bg='#e0e0e0', fg='black',
+                                    font=('Arial', 11))
         self.start_button.pack(side='left', padx=5)
         
-        self.stop_button = ttk.Button(button_frame, text="停止", command=self.stop_clicking, state='disabled')
+        self.stop_button = tk.Button(button_frame, text="停止", 
+                                   command=self.stop_clicking, 
+                                   state='disabled',
+                                   bg='#e0e0e0', fg='black',
+                                   font=('Arial', 11))
         self.stop_button.pack(side='left', padx=5)
         
         # 日誌區
-        ttk.Label(self.main_frame, text="執行日誌:").pack(anchor='w')
-        self.log_text = tk.Text(self.main_frame, width=60, height=20)
-        self.log_text.pack(pady=5, fill='both', expand=True)
+        log_label = tk.Label(self.main_frame, text="執行日誌:", 
+                            bg=BG_COLOR, fg=FG_COLOR, font=('Arial', 12))
+        log_label.pack(anchor='w', pady=(10,5))
+        
+        self.log_text = tk.Text(self.main_frame, width=70, height=20,
+                               bg='white', fg='black', font=('Arial', 11))
+        self.log_text.pack(fill='both', expand=True)
+        
+        # 添加捲軸
+        scrollbar = tk.Scrollbar(self.main_frame, command=self.log_text.yview)
+        scrollbar.pack(side='right', fill='y')
+        self.log_text.config(yscrollcommand=scrollbar.set)
         
         self.is_running = False
         self.driver = None
-        
+    
     def log(self, message):
         self.log_text.insert(tk.END, message + "\n")
         self.log_text.see(tk.END)
@@ -168,7 +199,6 @@ class AutoClickerGUI:
 
 def main():
     root = tk.Tk()
-    root.configure(bg='white')  # 設定根視窗背景為白色
     app = AutoClickerGUI(root)
     root.mainloop()
 
